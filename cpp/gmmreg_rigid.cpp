@@ -102,9 +102,12 @@ void RigidRegistration::StartRegistration(vnl_vector<double>& params) {
   //计算的迭代循环
   for (unsigned int k = 0; k < this->level_; ++k) {
     std::cout<<"####################################"<<std::endl;  
-    std::cout<<"第"<<k<<"次循环！"<<std::endl;
+    std::cout<<"第"<<k<<"级别(level)迭代！"<<std::endl;
 
     func_->SetScale(this->v_scale_[k]);
+    //printf("sigma = %lf\n",k,this->v_scale_[k]);
+    //printf("max_func_eval is = %d\n",k,this->v_func_evals_[k]);
+    //将旋转参数传递给 params
     SetParam(params);
     minimizer.set_max_function_evals(this->v_func_evals_[k]);
     minimizer.set_f_tolerance(1e-7);
@@ -116,11 +119,14 @@ void RigidRegistration::StartRegistration(vnl_vector<double>& params) {
       break;
     }
 
+    printf("Debug!");
     double fxval = func_->f(params);
     std::cout << "Cost function minimized to " << fxval << std::endl
               << "# of iterations: " << minimizer.get_num_iterations() << ", "
               << "# of evaluations: " << minimizer.get_num_evaluations()
               << std::endl;
+    std::cout<<"第"<<k<<"级别(level)迭代结束END！"<<std::endl;
+    
   }
   std::cout<<"点云配准结束！"<<std::endl;
 }
@@ -130,6 +136,8 @@ int RigidRegistration::SetInitParams(const char* f_config) {
   // ""
   GetPrivateProfileString(this->section_, "init_rigid", NULL, f_init_rigid, 80,
                           f_config);
+  printf("init arg get!  \n");
+  printf("f_config: %s\n", f_config);
   SetInitRigid(f_init_rigid);
   return 0;
 }

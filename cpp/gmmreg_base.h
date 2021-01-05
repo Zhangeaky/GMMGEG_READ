@@ -48,7 +48,9 @@ class Base {
   d_;
 
   // each row is a sample point
-  vnl_matrix<double> model_, scene_, ctrl_pts_, transformed_model_;
+  vnl_matrix<double> model_, scene_, ctrl_pts_, 
+  // 经过变换矩阵变换的model
+  transformed_model_;
 #ifdef USE_KDTREE
   std::unique_ptr<NanoflannTree<double>> model_tree_;
   std::unique_ptr<NanoflannTree<double>> scene_tree_;
