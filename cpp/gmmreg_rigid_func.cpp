@@ -17,21 +17,24 @@ double RigidFunc::Eval(const double& f, vnl_matrix<double>* g) {
 }
 
 double RigidFunc::f(const vnl_vector<double>& x) {
-  printf("inter f()\n");
+  
 
   // 根据x进行变换
   base_->PerformTransform(x);
 
 #ifdef USE_KDTREE
+  //printf("  use kdtree!\n");
   double energy =
       FastGaussTransform(*(base_->scene_tree_.get()), base_->transformed_model_,
                          scale_, gradient_);
 #else
+  printf("  do not use kdtree!\n");
+
   double energy = GaussTransform(base_->transformed_model_, base_->scene_,
                                  scale_, gradient_);
 #endif
   return Eval(energy, &gradient_);
-  printf("out of  f()\n");
+  //printf("out of  f()\n");
 }
 
 void RigidFunc::gradf(const vnl_vector<double>& x, vnl_vector<double>& g) {

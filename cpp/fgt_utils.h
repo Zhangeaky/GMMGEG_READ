@@ -88,7 +88,7 @@ struct NanoflannTree {
 template <typename T>
 T FastGaussTransform(const NanoflannTree<T>& tree, const PointCloud<T>& moving,
                      T scale, vnl_matrix<T>& gradient) {
-  printf("----------FastGaussTransform----------\n");
+  //printf("----------FastGaussTransform----------\n");
   //用指针访问导数 
   T* grad = gradient.data_block();
 
@@ -104,7 +104,7 @@ T FastGaussTransform(const NanoflannTree<T>& tree, const PointCloud<T>& moving,
   for (int i = 0; i < m * dim; ++i) {
     grad[i] = 0;
   }
-  printf("----------FastGaussTransformEND----------\n");
+  //printf("----------FastGaussTransformEND----------\n");
   const T* A = moving.data_block();
   //scene点云
   const T* B = tree.matrix_adaptor.derived().data_block();

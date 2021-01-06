@@ -91,39 +91,48 @@ void SetRigidTransformBound(const int d, vnl_lbfgsb* minimizer) {
 }
 
 void RigidRegistration::StartRegistration(vnl_vector<double>& params) {
+
+  //有参构造简单赋值
+  // 调用 init_param函数
   vnl_lbfgsb minimizer(*func_);
   // 四元数部分旋转参数的上上下界设置为0-1，平移矩阵部分的参数没有上下界
   SetRigidTransformBound(this->d_, &minimizer);
-  //给函数的实属性 通过点云配准实例赋值
+  //给函数的实属性 通过点云配准实例赋值 把this传过去的过程实际上也是把读取的点运数据读过去了
   func_->SetBase(this);
-  
-  std::cout <<"level is: "<<this->level_<<"log at:"<<__DATE__<<__TIME__<<std::endl;
-  
-  //计算的迭代循环
+
   for (unsigned int k = 0; k < this->level_; ++k) {
     std::cout<<"####################################"<<std::endl;  
     std::cout<<"第"<<k<<"级别(level)迭代！"<<std::endl;
 
+    //设置 sigmag 给cost函数
     func_->SetScale(this->v_scale_[k]);
-    //printf("sigma = %lf\n",k,this->v_scale_[k]);
+    printf("  sigma = %lf\n",k,this->v_scale_[k]);
     //printf("max_func_eval is = %d\n",k,this->v_func_evals_[k]);
-    //将旋转参数传递给 params
+    
+    //将旋转参数传递给 params 返回出来
     SetParam(params);
     minimizer.set_max_function_evals(this->v_func_evals_[k]);
     minimizer.set_f_tolerance(1e-7);
     minimizer.set_x_tolerance(1e-5);
     // For more options, see
     // https://public.kitware.com/vxl/doc/release/core/vnl/html/vnl__nonlinear__minimizer_8h_source.html
+  
+    //将params作为x 未知数
+
+    //最关键的一步
     minimizer.minimize(params);
+    printf("minimizer.minimize over\n");
+
     if (minimizer.get_failure_code() < 0) {
       break;
     }
 
-    printf("Debug!");
+    printf("计算函数值 ...");
     double fxval = func_->f(params);
-    std::cout << "Cost function minimized to " << fxval << std::endl
-              << "# of iterations: " << minimizer.get_num_iterations() << ", "
-              << "# of evaluations: " << minimizer.get_num_evaluations()
+
+    std::cout << "目前函数最小值是 " << fxval << std::endl
+              << "# 循环迭代次数（每一次循环包含若干次函数计算）: " << minimizer.get_num_iterations() << ", "
+              << "# 函数总共求值次数: " << minimizer.get_num_evaluations()
               << std::endl;
     std::cout<<"第"<<k<<"级别(level)迭代结束END！"<<std::endl;
     
@@ -136,8 +145,7 @@ int RigidRegistration::SetInitParams(const char* f_config) {
   // ""
   GetPrivateProfileString(this->section_, "init_rigid", NULL, f_init_rigid, 80,
                           f_config);
-  printf("init arg get!  \n");
-  printf("f_config: %s\n", f_config);
+  printf("f_initconfig: %s\n", f_config);
   SetInitRigid(f_init_rigid);
   return 0;
 }

@@ -37,7 +37,7 @@ class RigidFunc : public vnl_cost_function {
   vnl_matrix<double> gradient_;//导数
 
  private:
- //
+ 
   double scale_;
   int m_, d_;
 };
